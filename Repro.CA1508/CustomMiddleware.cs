@@ -23,7 +23,7 @@
                 throw new ArgumentNullException(nameof(context));
             }
 
-            // CA1508 raised when using the extension method
+            // CA1508 raised when using the `CreateTenantScope` extension method
             using (this.logger.CreateTenantScope(tenantName))
             {
                 var sr = new StreamReader(context.Request.Body);
@@ -31,7 +31,15 @@
                 this.logger.LogInformation($"Body Text: {bodyText}");
             }
 
-            // Apparently it is fine to directly call what the extension method is doing
+            // Using a discard variable does not raise CA1508
+            using (var _ = this.logger.CreateTenantScope(tenantName))
+            {
+                var sr = new StreamReader(context.Request.Body);
+                var bodyText = await sr.ReadToEndAsync().ConfigureAwait(false);
+                this.logger.LogInformation($"Body Text: {bodyText}");
+            }
+
+            // Apparently it is fine to do the extension method is doing
             using (this.logger.BeginScope(new[] { new KeyValuePair<string, object>("tenant", tenantName) }))
             {
                 var sr = new StreamReader(context.Request.Body);
