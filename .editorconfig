@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CA1508: Avoid dead conditional code
+dotnet_diagnostic.CA1508.severity = error
